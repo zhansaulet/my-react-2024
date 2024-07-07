@@ -16,6 +16,12 @@ module.exports = {
       { allowConstantExport: true },
     ],
     "@typescript-eslint/no-explicit-any": "error",
-    "react-compiler/react-compiler": "error"
+    "react-compiler/react-compiler": "error",
+    "prettier/prettier": [
+  "error",
+  {
+    "endOfLine": "auto"
+  },
+],
   },
 }

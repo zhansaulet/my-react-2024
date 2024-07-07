@@ -6,7 +6,7 @@ module.exports = {
   "printWidth": 80,
   "singleQuote": true,
   "jsxSingleQuote": true,
-  "endOfLine": "lf",
+  "endOfLine": "auto",
   "bracketSpacing": true,
   "bracketSameLine": false,
   "overrides": [
