@@ -31,15 +31,20 @@ class SearchBar extends Component<SearchTermProps, SearchTermState> {
 
   render() {
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
+      <div className='mb-5 relative flex w-[400px] flex-wrap items-stretch'>
+        <form
+          onSubmit={this.handleSubmit}
+          className='mb-5 relative flex w-full flex-wrap items-stretch'
+        >
           <input
             type='search'
             className={styles.searchBar}
             value={this.state.term}
             onChange={this.handleChange}
           />
-          <button type='submit'>Search</button>
+          <button type='submit' className={styles.searchBtn}>
+            Search
+          </button>
         </form>
       </div>
     );

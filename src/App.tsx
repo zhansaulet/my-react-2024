@@ -1,5 +1,7 @@
 import { Component } from 'react';
 import SearchBar from './components/SearchBar';
+import PersonCard from './components/PersonCard';
+import './App.scss';
 
 const BASE_URL = 'https://swapi.dev/api';
 
@@ -44,14 +46,15 @@ interface ISpecies extends ICharacter {
 
 type Gender = 'male' | 'female' | 'n/a' | 'unknown';
 
-interface IPerson extends ICharacter {
+export interface IPerson extends ICharacter {
   starships?: IStarship[];
   vehicles?: IVehicle[];
-  birthYear: string;
+  birth_year: string;
   gender?: Gender;
   eyeColor: string;
   species: ISpecies[];
   mass: number;
+  height: number;
 }
 
 interface IPlanet extends IEntity {
@@ -126,12 +129,8 @@ class App extends Component<object, IAppProps> {
           this.renderLoader()
         ) : (
           <div>
-            <h3>Star Wars People</h3>
-            <ul>
-              {this.state.people?.map((person, index) => (
-                <li key={index}>{person.name}</li>
-              ))}
-            </ul>
+            <h1 className='mb-3 font-bold text-lg'>Star Wars People</h1>
+            <PersonCard characters={this.state.people} />
           </div>
         )}
       </div>
