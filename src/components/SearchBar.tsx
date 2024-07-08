@@ -1,9 +1,8 @@
-import { ChangeEvent, FormEventHandler, Component, FormEvent } from 'react';
+import { ChangeEvent, Component, FormEvent } from 'react';
 import styles from './SearchBar.module.scss';
 
 interface SearchTermProps {
   term: string;
-  onInputSubmit: FormEventHandler;
   placeholder: string;
 }
 
@@ -28,7 +27,6 @@ class SearchBar extends Component<SearchTermProps, SearchTermState> {
 
   handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    this.props.onInputSubmit(e);
   };
 
   render() {
