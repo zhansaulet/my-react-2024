@@ -90,7 +90,7 @@ interface IVehicle extends IEntity {
 interface IAppProps {
   isLoading: boolean;
   people?: IPerson[];
-  selectedPerson?: IPerson;
+  selectedPerson?: IPerson[];
   selectedPersonName?: string;
 }
 
@@ -114,8 +114,17 @@ class App extends Component<object, IAppProps> {
       isLoading: false,
       people: data.results
     });
-    console.log(this.state.people);
   }
+
+  handleSearchSubmit = async (searchTerm: string) => {
+    const response = await fetch(`${BASE_URL}/people/?search=${searchTerm}`);
+    const data: PagedResults<IPerson> = await response.json();
+
+    this.setState({
+      isLoading: false,
+      selectedPerson: data.results
+    });
+  };
 
   renderLoader() {
     return <h1>Loading...</h1>;
@@ -124,13 +133,20 @@ class App extends Component<object, IAppProps> {
   render() {
     return (
       <div>
-        <SearchBar term='' placeholder='' />
+        <SearchBar onSubmit={this.handleSearchSubmit} placeholder='' />
         {this.state.isLoading ? (
           this.renderLoader()
         ) : (
           <div>
             <h1 className='mb-3 font-bold text-lg'>Star Wars People</h1>
-            <PersonCard characters={this.state.people} />
+            {!this.state.selectedPerson ? (
+              <PersonCard characters={this.state.people} />
+            ) : (
+              <div>
+                <p className='mb-3 font-bold text-md'>Search Result:</p>
+                <PersonCard characters={this.state.selectedPerson} />
+              </div>
+            )}
           </div>
         )}
       </div>

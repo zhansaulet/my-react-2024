@@ -2,7 +2,7 @@ import { ChangeEvent, Component, FormEvent } from 'react';
 import styles from './SearchBar.module.scss';
 
 interface SearchTermProps {
-  term: string;
+  onSubmit: (searchTerm: string) => void;
   placeholder: string;
 }
 
@@ -13,8 +13,9 @@ interface SearchTermState {
 class SearchBar extends Component<SearchTermProps, SearchTermState> {
   constructor(props: SearchTermProps) {
     super(props);
+    const savedSearchTerm = localStorage.getItem('searchTerm') || '';
     this.state = {
-      term: ''
+      term: savedSearchTerm
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -22,11 +23,15 @@ class SearchBar extends Component<SearchTermProps, SearchTermState> {
   }
 
   handleChange = (e: ChangeEvent) => {
-    if (e.target) this.setState({ term: (e.target as HTMLInputElement).value });
+    if (e.target) {
+      this.setState({ term: (e.target as HTMLInputElement).value });
+    }
   };
 
-  handleSubmit = (e: FormEvent) => {
+  handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    this.props.onSubmit(this.state.term);
+    localStorage.setItem('searchTerm', this.state.term);
   };
 
   render() {
