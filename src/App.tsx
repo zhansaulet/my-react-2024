@@ -130,10 +130,24 @@ class App extends Component<object, IAppProps> {
     return <h1>Loading...</h1>;
   }
 
+  throwError = () => {
+    this.setState(() => {
+      throw new Error('Test error thrown by button click');
+    });
+  };
+
   render() {
     return (
       <div>
-        <SearchBar onSubmit={this.handleSearchSubmit} placeholder='' />
+        <div className='flex gap-2'>
+          <SearchBar onSubmit={this.handleSearchSubmit} placeholder='' />
+          <button
+            className='relative z-[2] h-[35px] flex items-center rounded px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg bg-[#3B71CA]'
+            onClick={this.throwError}
+          >
+            Throw Error
+          </button>
+        </div>
         {this.state.isLoading ? (
           this.renderLoader()
         ) : (
