@@ -89,6 +89,7 @@ interface IVehicle extends IEntity {
 
 interface IAppProps {
   isLoading: boolean;
+  savedSearchTerm: string;
   people?: IPerson[];
   selectedPerson?: IPerson[];
   selectedPersonName?: string;
@@ -103,10 +104,21 @@ interface PagedResults<T> {
 
 class App extends Component<object, IAppProps> {
   state: Readonly<IAppProps> = {
-    isLoading: true
+    isLoading: false,
+    savedSearchTerm: localStorage.getItem('searchTerm') || ''
   };
 
   async componentDidMount(): Promise<void> {
+    const { savedSearchTerm } = this.state;
+    if (savedSearchTerm) {
+      this.handleSearchSubmit(savedSearchTerm);
+    } else {
+      this.handleFetchPeople();
+    }
+  }
+
+  handleFetchPeople = async (): Promise<void> => {
+    this.setState({ isLoading: true });
     const response = await fetch(`${BASE_URL}/people/?page=1`);
     const data: PagedResults<IPerson> = await response.json();
 
@@ -114,9 +126,10 @@ class App extends Component<object, IAppProps> {
       isLoading: false,
       people: data.results
     });
-  }
+  };
 
   handleSearchSubmit = async (searchTerm: string) => {
+    this.setState({ isLoading: true });
     const response = await fetch(`${BASE_URL}/people/?search=${searchTerm}`);
     const data: PagedResults<IPerson> = await response.json();
 
