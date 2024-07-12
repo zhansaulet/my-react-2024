@@ -1,6 +1,6 @@
-import { Component } from 'react';
-import SearchBar from './components/SearchBar';
-import PersonCard from './components/PersonCard';
+import { useEffect, useState } from 'react';
+import SearchBar from './components/SearchBar/SearchBar';
+import PersonCard from './components/PersonCard/PersonCard';
 import './App.scss';
 
 const BASE_URL = 'https://swapi.dev/api';
@@ -87,13 +87,13 @@ interface IVehicle extends IEntity {
   crew: number;
 }
 
-interface IAppProps {
-  isLoading: boolean;
-  savedSearchTerm: string;
-  people?: IPerson[];
-  selectedPerson?: IPerson[];
-  selectedPersonName?: string;
-}
+// interface IAppProps {
+//   isLoading: boolean;
+//   savedSearchTerm: string;
+//   people?: IPerson[];
+//   selectedPerson?: IPerson[];
+//   selectedPersonName?: string;
+// }
 
 interface PagedResults<T> {
   count: number;
@@ -102,83 +102,152 @@ interface PagedResults<T> {
   results: T[];
 }
 
-class App extends Component<object, IAppProps> {
-  state: Readonly<IAppProps> = {
-    isLoading: false,
-    savedSearchTerm: localStorage.getItem('searchTerm') || ''
-  };
+const App = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [people, setPeople] = useState<IPerson[]>([]);
+  const [selectedPerson, setSelectedPerson] = useState<IPerson[]>([]);
+  const savedSearchTerm = localStorage.getItem('searchTerm') || '';
 
-  async componentDidMount(): Promise<void> {
-    const { savedSearchTerm } = this.state;
-    if (savedSearchTerm) {
-      this.handleSearchSubmit(savedSearchTerm);
-    } else {
-      this.handleFetchPeople();
-    }
-  }
-
-  handleFetchPeople = async (): Promise<void> => {
-    this.setState({ isLoading: true });
+  const handleFetchPeople = async (): Promise<void> => {
+    setIsLoading(true);
     const response = await fetch(`${BASE_URL}/people/?page=1`);
     const data: PagedResults<IPerson> = await response.json();
 
-    this.setState({
-      isLoading: false,
-      people: data.results
-    });
+    setIsLoading(false);
+    setPeople(data.results);
   };
 
-  handleSearchSubmit = async (searchTerm: string) => {
-    this.setState({ isLoading: true });
+  const handleSearchSubmit = async (searchTerm: string) => {
+    setIsLoading(true);
     const response = await fetch(`${BASE_URL}/people/?search=${searchTerm}`);
     const data: PagedResults<IPerson> = await response.json();
 
-    this.setState({
-      isLoading: false,
-      selectedPerson: data.results
-    });
+    setIsLoading(false);
+    setSelectedPerson(data.results);
   };
 
-  renderLoader() {
+  useEffect(() => {
+    if (savedSearchTerm) {
+      handleSearchSubmit(savedSearchTerm);
+    } else {
+      handleFetchPeople();
+    }
+  });
+
+  const renderLoader = () => {
     return <h1>Loading...</h1>;
-  }
-
-  throwError = () => {
-    this.setState(() => {
-      throw new Error('Test error thrown by button click');
-    });
   };
 
-  render() {
-    return (
-      <div>
-        <div className='flex gap-2'>
-          <SearchBar onSubmit={this.handleSearchSubmit} placeholder='' />
-          <button
-            className='relative z-[2] h-[35px] flex items-center rounded px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg bg-[#3B71CA]'
-            onClick={this.throwError}
-          >
-            Throw Error
-          </button>
-        </div>
-        {this.state.isLoading ? (
-          this.renderLoader()
-        ) : (
-          <div>
-            <h1 className='mb-3 font-bold text-lg'>Star Wars People</h1>
-            {!this.state.selectedPerson ? (
-              <PersonCard characters={this.state.people} />
-            ) : (
-              <div>
-                <p className='mb-3 font-bold text-md'>Search Result:</p>
-                <PersonCard characters={this.state.selectedPerson} />
-              </div>
-            )}
-          </div>
-        )}
+  const throwError = () => {
+    throw new Error('Test error thrown by button click');
+  };
+
+  return (
+    <div>
+      <div className='flex gap-2'>
+        <SearchBar onSubmit={handleSearchSubmit} placeholder='' />
+        <button
+          className='relative z-[2] h-[35px] flex items-center rounded px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg bg-[#3B71CA]'
+          onClick={throwError}
+        >
+          Throw Error
+        </button>
       </div>
-    );
-  }
-}
+      {isLoading ? (
+        renderLoader()
+      ) : (
+        <div>
+          <h1 className='mb-3 font-bold text-lg'>Star Wars People</h1>
+          {!selectedPerson ? (
+            <PersonCard characters={people} />
+          ) : (
+            <div>
+              <p className='mb-3 font-bold text-md'>Search Result:</p>
+              <PersonCard characters={selectedPerson} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+// class App extends Component<object, IAppProps> {
+//   state: Readonly<IAppProps> = {
+//     isLoading: false,
+//     savedSearchTerm: localStorage.getItem('searchTerm') || ''
+//   };
+
+//   async componentDidMount(): Promise<void> {
+//     const { savedSearchTerm } = this.state;
+//     if (savedSearchTerm) {
+//       this.handleSearchSubmit(savedSearchTerm);
+//     } else {
+//       this.handleFetchPeople();
+//     }
+//   }
+
+//   handleFetchPeople = async (): Promise<void> => {
+//     this.setState({ isLoading: true });
+//     const response = await fetch(`${BASE_URL}/people/?page=1`);
+//     const data: PagedResults<IPerson> = await response.json();
+
+//     this.setState({
+//       isLoading: false,
+//       people: data.results
+//     });
+//   };
+
+//   handleSearchSubmit = async (searchTerm: string) => {
+//     this.setState({ isLoading: true });
+//     const response = await fetch(`${BASE_URL}/people/?search=${searchTerm}`);
+//     const data: PagedResults<IPerson> = await response.json();
+
+//     this.setState({
+//       isLoading: false,
+//       selectedPerson: data.results
+//     });
+//   };
+
+//   renderLoader() {
+//     return <h1>Loading...</h1>;
+//   }
+
+//   throwError = () => {
+//     this.setState(() => {
+//       throw new Error('Test error thrown by button click');
+//     });
+//   };
+
+//   render() {
+//     return (
+//       <div>
+//         <div className='flex gap-2'>
+//           <SearchBar onSubmit={this.handleSearchSubmit} placeholder='' />
+//           <button
+//             className='relative z-[2] h-[35px] flex items-center rounded px-6 py-2.5 text-xs font-medium uppercase leading-tight text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg bg-[#3B71CA]'
+//             onClick={this.throwError}
+//           >
+//             Throw Error
+//           </button>
+//         </div>
+//         {this.state.isLoading ? (
+//           this.renderLoader()
+//         ) : (
+//           <div>
+//             <h1 className='mb-3 font-bold text-lg'>Star Wars People</h1>
+//             {!this.state.selectedPerson ? (
+//               <PersonCard characters={this.state.people} />
+//             ) : (
+//               <div>
+//                 <p className='mb-3 font-bold text-md'>Search Result:</p>
+//                 <PersonCard characters={this.state.selectedPerson} />
+//               </div>
+//             )}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   }
+// }
 
 export default App;
